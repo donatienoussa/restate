@@ -1,74 +1,123 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import { Cards, FeaturedCards } from "@/components/Cards";
+import Filters from "@/components/Filters";
+import NoResult from "@/components/NoResult";
+import Search from "@/components/Search";
+import icons from "@/constants/icons";
+import { useGlobalContext } from "@/contexts/global-provider";
+import { useSupabase } from "@/hooks/useSupabase";
+import { getLatestProperties, getProperties } from "@/lib/supabase";
+import greeting from "@/lib/utils/greet";
+import { router } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
+import { useEffect } from "react";
+import { ScrollView, View, Image, Text, TouchableOpacity, FlatList, ActivityIndicator, Button } from "react-native";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+export default function Home() {
+  const { user } = useGlobalContext();
+  const params = useLocalSearchParams<{ filter?: string, query?: string }>();
 
-export default function HomeScreen() {
+  const { data: latestProperties, loading: latestPropertiesLoading } = useSupabase({
+    fn: getLatestProperties
+  });
+
+  const { data: properties, loading: propertiesLoading, refetch } = useSupabase({
+    fn: getProperties,
+    params: {
+      filter: params.filter!,
+      query: params.query!,
+      limit: 6
+    },
+    skip: true
+  });
+
+  const handleCardPress = (id: string) => {
+    router.push(`/properties/${id}`);
+  };
+
+  useEffect(() => {
+    refetch({
+      filter: params.filter!,
+      query: params.query!,
+      limit: 6
+    });
+  }, [params.query, params.filter]);
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
+    <SafeAreaProvider>
+      <SafeAreaView className="bg-white dark:bg-black h-full w-full">
+        <FlatList
+          data={properties}
+          renderItem={({ item }) => (
+            <Cards property={item} onPress={() => handleCardPress(item.id)} />
+          )}
+          keyExtractor={(item) => item.id}
+          numColumns={2}
+          contentContainerClassName="pb-32"
+          columnWrapperClassName="flex gap-5 px-5"
+          ListEmptyComponent={
+            propertiesLoading ? (
+              <ActivityIndicator size="large" />
+            ) : (
+              <NoResult />
+            )
+          }
+          ListHeaderComponent={
+            <View className="mt-5 px-5">
+              <View className="flex flex-row justify-between items-center mt-5">
+                <View className="flex flex-row items-center gap-3">
+                  <Image source={{ uri: user?.avatar }} className="size-12 rounded-full" />
+                  <View className="flex flex-col">
+                    <Text className="font-rubik-light text-black dark:text-white">{greeting()}</Text>
+                    <Text className="font-rubik-bold text-black dark:text-white">{user?.name}</Text>
+                  </View>
+                </View>
+                <Image source={icons.bell} className="size-6" />
+              </View>
+
+              <Search />
+
+              <View className="mt-5">
+                <View className="flex flex-row justify-between items-center">
+                  <Text className="text-black dark:text-white font-rubik-bold text-2xl">En vedette</Text>
+                  <TouchableOpacity>
+                    <Text className="text-primary-300 font-rubik-bold text-2xl">Voir tout</Text>
+                  </TouchableOpacity>
+                </View>
+
+                {latestPropertiesLoading ? (
+                  <ActivityIndicator size="large" className="text-primary-300" />
+                ) : !latestProperties || latestProperties.length === 0 ? (
+                  <NoResult />
+                ) : (
+                  <FlatList
+                    data={latestProperties}
+                    renderItem={({ item }) => (
+                      <FeaturedCards property={item} onPress={() => handleCardPress(item.id)} />
+                    )}
+                    horizontal
+                    keyExtractor={(item) => item.id}
+                    bounces={false}
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerClassName="flex gap-5 mt-5"
+                  />
+                )}
+              </View>
+
+              <View className="mt-5">
+                <View className="flex flex-row justify-between items-center">
+                  <Text className="text-black dark:text-white font-rubik-bold text-2xl">Nos recommandations</Text>
+                  <TouchableOpacity>
+                    <Text className="text-primary-300 font-rubik-bold text-2xl">Voir tout</Text>
+                  </TouchableOpacity>
+                </View>
+
+                <Filters />
+              </View>
+            </View>
+          }
         />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
-});
