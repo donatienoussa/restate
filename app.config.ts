@@ -50,8 +50,12 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#ffffff"
         },
-        "package": getUniqueIdentifier()
-        
+      "package": getUniqueIdentifier(),
+      "config": {
+        "googleMaps": {
+          "apiKey": process.env.EXPO_GOOGLE_MAPS_API_KEY
+        }
+      } 
     },
     "web": {
       "bundler": "metro",

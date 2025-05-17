@@ -8,17 +8,17 @@ export default function AppLayout() {
     const { loading, isLogged } = useGlobalContext();
 
     if (loading) {
-        
+
         return (
             <SafeAreaView className="bg-white flex-1 w-full justify-center items-center">
                 <ActivityIndicator className="text-primary" size="large" />
             </SafeAreaView>
-        );  
+        );
     }
 
     if (!isLogged) {
         return <Redirect href="/sign-in" />
     }
 
-    return <Slot />;  {/** Meaning current screen */}      
+    return <Slot />; {/** Meaning current screen */ }
 }

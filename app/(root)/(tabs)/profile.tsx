@@ -33,7 +33,7 @@ const SettingItem = ({ icon, title, onPress, textStyle, showArrow = true, isDark
 }
 
 export default function Profile() {
-  const { user, refetch } = useGlobalContext();
+  const { user } = useGlobalContext();
   const colorScheme = useColorScheme();
 
   const isDarkMode = colorScheme === 'dark';
@@ -44,7 +44,6 @@ export default function Profile() {
 
       if (result) {
         toast("Vous êtes déconnecté.");
-        refetch();
       }
     } catch (error) {
       console.log(error);

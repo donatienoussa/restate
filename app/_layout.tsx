@@ -15,8 +15,21 @@ import GlobalProvider from '@/contexts/global-provider';
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
+/**
+ * Ceci est le layout principal de l'application. 
+ * On y fait la gestion du dark mode, de la statusbar et du chargement des polices. 
+ */
 export default function RootLayout() {
+
+  // Ce hook detecte le mode dark ou light selon la configuration de l'appareil
   const colorScheme = useColorScheme();
+
+  /* 
+    Les polices utilisées sont des polices locales. Pour les utiliser, il faut suivre trois étapes.
+    1. Après le téléchargement des polices, il faut les importer dans le fichier app.config.ts 
+    2. Importer les polices dans le fichier _layout.tsx
+    3. Importer les polices dans le fichier tailwindcss.config.js. Comme ça, on peut les utiliser directement avec tailwindcss (ex: font-rubik)
+  */ 
   const [loaded] = useFonts({
     "Rubik-Regular": require('../assets/fonts/Rubik-Regular.ttf'),
     "Rubik-Bold": require('../assets/fonts/Rubik-Bold.ttf'),

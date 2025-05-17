@@ -2,7 +2,6 @@ import { View, Text, Image } from 'react-native'
 import React from 'react'
 import { Stack, Tabs } from 'expo-router'
 import icons from '@/constants/icons'
-import { Ionicons } from '@expo/vector-icons'
 import { ImageSourcePropType } from 'react-native'
 
 

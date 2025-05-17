@@ -36,7 +36,7 @@ const Property = () => {
         showsVerticalScrollIndicator={false}
         contentContainerClassName="pb-32 bg-white dark:bg-black"
       >
-        <View className="relative w-full" style={{ height: windowHeight / 2 }}>
+        <View className="relative w-full" style={{ height: windowHeight /2  }}>
           <Image
             source={{ uri: property?.image }}
             className="size-full"

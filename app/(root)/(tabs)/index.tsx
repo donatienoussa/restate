@@ -120,4 +120,6 @@ export default function Home() {
       </SafeAreaView>
     </SafeAreaProvider>
   );
+
+ 
 }
